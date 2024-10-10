@@ -1,0 +1,7 @@
+[build]
+  functions = "netlify/functions"  # Directory for Netlify Functions
+
+[[redirects]]
+  from = "/api/libguides-proxy"              # Route for the proxy service
+  to = "/.netlify/functions/proxy" # Serverless function endpoint
+  status = 200
