@@ -2,6 +2,11 @@
   functions = "netlify/functions"  # Directory for Netlify Functions
 
 [[redirects]]
-  from = "/api/libguides-proxy"              # Route for the proxy service
-  to = "/.netlify/functions/proxy" # Serverless function endpoint
+  from = "/api/libguides/global/proxy"              # Route for the proxy service
+  to = "/.netlify/functions/globalDataProxy" # Serverless function endpoint
+  status = 200
+
+[[redirects]]
+  from = "/api/libguides/library/status/updates/proxy"              # Route for the proxy service
+  to = "/.netlify/functions/libraryStatusUpdatesProxy" # Serverless function endpoint
   status = 200
