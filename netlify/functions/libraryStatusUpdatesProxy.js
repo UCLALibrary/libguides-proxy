@@ -80,14 +80,30 @@ export default async (request) => {
     const dataSection1 = await responseSection1.text();
     const dataSection2 = await responseSection2.text();
 
-    // Parse the HTML
-    const document1 = parseFromString(dataSection1, 'text/html');
-    blocks[0].sectionTitle = document1.getElementsByTagName('h3')[0].textContent;
-    blocks[0].richText = document1.getElementsByTagName('ul')[0].outerHTML;
-    // Parse the HTML
-    const document2 = parseFromString(dataSection2, 'text/html');
-    blocks[1].sectionTitle = document2.getElementsByTagName('h3')[0].textContent;
-    blocks[1].richText = document2.getElementsByTagName('ul')[0].outerHTML;
+    // Helper function to extract HTML nodes after <h3>
+    const extractHTMLAfterH3 = (htmlString, id) => {
+      const document = parseFromString(htmlString, 'text/html');
+      const contentDiv = document.getElementById(id);
+      if (!contentDiv) return '';
+      
+      const h3Element = contentDiv.querySelector('h3');
+      let contentAfterH3 = '';
+
+      if (h3Element) {
+        let nextSibling = h3Element.nextSibling;
+        while (nextSibling) {
+          if (nextSibling.outerHTML) {
+            contentAfterH3 += nextSibling.outerHTML;
+          }
+          nextSibling = nextSibling.nextSibling;
+        }
+      }
+      return contentAfterH3;
+    };
+
+    // Process each section and extract HTML nodes after <h3>
+    blocks[0].richText = extractHTMLAfterH3(dataSection1, 's-lg-content-78601395');
+    blocks[1].richText = extractHTMLAfterH3(dataSection2, 's-lg-content-78601402');
     
     
     // Return the response from the external API

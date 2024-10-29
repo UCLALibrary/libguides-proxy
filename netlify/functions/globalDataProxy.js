@@ -6,7 +6,7 @@ const globals = {
     text: ""
   },
   fullBannerAlert:{
-    title: "Alert",
+   // title: "Alert", //No title for full banner
     text: ""
   }
 };
