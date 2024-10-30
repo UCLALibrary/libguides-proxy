@@ -51,13 +51,17 @@ const blocks = [
     ]
   }
 ]
+const response = {
+  summary:"",
+  blocks
+}
 
 export default async (request) => {
   // We have not built a component for this yet for the main library website
   
   const libraryStatusUpdateSection1ApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33464944&map_id=39354145&content_only=0&include_jquery=1&config_id=1729804600932' 
   const libraryStatusUpdateSection2ApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33464982&map_id=39354184&content_only=0&include_jquery=1&config_id=1729804613204' 
-  
+  const libraryStatusUpdateSummaryApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33537384&map_id=39436956&content_only=0&include_jquery=0&config_id=1730306889766' 
   const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*', // Allows all origins (you can restrict this to specific domains)
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -72,16 +76,19 @@ export default async (request) => {
       })
     }
      // Fetch data from both sections
-     const [responseSection1, responseSection2] = await Promise.all([
+     const [responseSection1, responseSection2, responseSummary] = await Promise.all([
       fetch(libraryStatusUpdateSection1ApiUrl),
       fetch(libraryStatusUpdateSection2ApiUrl),
+      fetch(libraryStatusUpdateSummaryApiUrl),
     ])
 
     const dataSection1 = await responseSection1.text()
     const dataSection2 = await responseSection2.text()
+    const dataSummary = await responseSummary.text()
+
 
     // Helper function to extract HTML nodes after <h3>
-    const extractHTMLAfterH3 = (htmlString, id) => {
+    const extractHTMLAfterH3 = (htmlString, id, item) => {
       const dom = new JSDOM(htmlString);
       const document = dom.window.document;
       const contentDiv = document.getElementById(id)
@@ -95,7 +102,7 @@ export default async (request) => {
         console.log("h3 not found");
         return '';
       }
-
+      item.sectionTitle = h3Element.textContent
       let contentAfterH3 = '';
       let sibling = h3Element.nextElementSibling;
 
@@ -109,13 +116,16 @@ export default async (request) => {
     }
 
     // Process each section and extract HTML nodes after <h3>
-    blocks[0].richText = extractHTMLAfterH3(dataSection1, 's-lg-content-78601395')
-    blocks[1].richText = extractHTMLAfterH3(dataSection2, 's-lg-content-78601402')
-    
+    blocks[0].richText = extractHTMLAfterH3(dataSection1, 's-lg-content-78601395', blocks[0])
+    blocks[1].richText = extractHTMLAfterH3(dataSection2, 's-lg-content-78601402', blocks[1])
+    const dom = new JSDOM(dataSummary);
+    const document = dom.window.document;
+    const contentDiv = document.getElementById('s-lg-content-78759148')
+    response.summary = contentDiv.innerHTML
     
     // Return the response from the external API
     return new Response(
-      JSON.stringify(blocks),{
+      JSON.stringify(response),{
         headers: {
           'Content-Type': 'application/json',
           ...CORS_HEADERS
