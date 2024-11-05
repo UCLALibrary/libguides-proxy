@@ -92,27 +92,30 @@ export default async (request) => {
       const dom = new JSDOM(htmlString);
       const document = dom.window.document;
       const contentDiv = document.getElementById(id)
-      if (!contentDiv) {
-        console.log("contentDiv not found");
-        return '';
+      if (contentDiv) {
+        const h3Element = contentDiv.querySelector('h3');
+        if (h3Element) {
+          item.sectionTitle = h3Element.textContent
+          let contentAfterH3 = '';
+          let sibling = h3Element.nextElementSibling;
+    
+          while (sibling) {
+            contentAfterH3 += sibling.outerHTML || '';
+            sibling = sibling.nextElementSibling;
+          }
+    
+          console.log("Final contentAfterH3:", contentAfterH3);
+          return contentAfterH3;
+        } else {
+          return ''
+        }
+      } else {
+        return ''
       }
 
-      const h3Element = contentDiv.querySelector('h3');
-      if (!h3Element) {
-        console.log("h3 not found");
-        return '';
-      }
-      item.sectionTitle = h3Element.textContent
-      let contentAfterH3 = '';
-      let sibling = h3Element.nextElementSibling;
-
-      while (sibling) {
-        contentAfterH3 += sibling.outerHTML || '';
-        sibling = sibling.nextElementSibling;
-      }
-
-      console.log("Final contentAfterH3:", contentAfterH3);
-      return contentAfterH3;
+      
+      
+      
     }
 
     // Process each section and extract HTML nodes after <h3>
