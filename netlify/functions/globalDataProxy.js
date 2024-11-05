@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 
 const globals = {
   libraryAlert: {
-    title: "Alert",
+    title: "",
     text: ""
   },
   fullBannerAlert:{
@@ -42,32 +42,29 @@ export default async (request) => {
     // Parse the HTML
     const document1 = parseFromString(dataSection1, 'text/html');
     // globals.fullBannerAlert.title = document1.getElementsByTagName('h3')[0]?.textContent;
-    globals.fullBannerAlert.text = document1.getElementById('s-lg-content-78281771').innerHTML;
+    globals.fullBannerAlert.text = document1.getElementById('s-lg-content-78281771')?.innerHTML;
+    console.log("globals.fullBannerAlert.text",globals.fullBannerAlert.text)
     // Parse the HTML
     const dom = new JSDOM(dataSection2);
     const document2 = dom.window.document;
     const contentDiv = document2.getElementById('s-lg-content-78601329')
-    if (!contentDiv) {
-      console.log("contentDiv not found");
-      return '';
-    }
-   
-    const h3Element = contentDiv.querySelector('h3');
-    if (!h3Element) {
-      console.log("h3 not found");
-      return '';
-    }
-    globals.libraryAlert.title = h3Element.textContent
-    let contentAfterH3 = '';
-    let sibling = h3Element.nextElementSibling;
-    while (sibling) {
-      contentAfterH3 += sibling.outerHTML || '';
-      sibling = sibling.nextElementSibling;
-    }
+    if (contentDiv) {
+      const h3Element = contentDiv.querySelector('h3');
+      if (h3Element) {
+        globals.libraryAlert.title = h3Element?.textContent
+        let contentAfterH3 = '';
+        let sibling = h3Element.nextElementSibling;
+        while (sibling) {
+          contentAfterH3 += sibling.outerHTML || '';
+          sibling = sibling.nextElementSibling;
+        }
 
-    console.log("Final contentAfterH3:", contentAfterH3);
-    // globals.libraryAlert.title = document2.getElementsByTagName('h3')[0].textContent;
-    globals.libraryAlert.text = contentAfterH3
+        console.log("Final contentAfterH3:", contentAfterH3);
+        // globals.libraryAlert.title = document2.getElementsByTagName('h3')[0].textContent;
+        globals.libraryAlert.text = contentAfterH3
+      }
+      
+    }
     console.log(globals)
     // Return the response from the external API
     return new Response(
