@@ -59,9 +59,9 @@ const response = {
 export default async (request) => {
   // We have not built a component for this yet for the main library website
   
-  const libraryStatusUpdateSection1ApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33464944&map_id=39354145&content_only=0&include_jquery=1&config_id=1729804600932' 
-  const libraryStatusUpdateSection2ApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33464982&map_id=39354184&content_only=0&include_jquery=1&config_id=1729804613204' 
-  const libraryStatusUpdateSummaryApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33537384&map_id=39436956&content_only=0&include_jquery=0&config_id=1730306889766' 
+  const libraryStatusUpdateSection1ApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33464944&map_id=39354145&content_only=0&include_jquery=1&config_id=1729804600932' // Box Name: Library Status Updates: Access To Libraries and Services
+  const libraryStatusUpdateSection2ApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=34656818&map_id=40758929&content_only=0&include_jquery=1&config_id=1752683253976' // Box Name: Library Status Updates: Planned Library Construction
+  const libraryStatusUpdateSummaryApiUrl = 'https://lgapi-us.libapps.com/widgets.php?site_id=705&widget_type=8&output_format=1&widget_embed_type=2&guide_id=1427138&box_id=33537384&map_id=39436956&content_only=0&include_jquery=0&config_id=1730306889766' // Box Name: Library Status Updates: Summary
   const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*', // Allows all origins (you can restrict this to specific domains)
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -119,11 +119,11 @@ export default async (request) => {
     }
 
     // Process each section and extract HTML nodes after <h3>
-    blocks[0].richText = extractHTMLAfterH3(dataSection1, 's-lg-content-78601395', blocks[0])
-    blocks[1].richText = extractHTMLAfterH3(dataSection2, 's-lg-content-78601402', blocks[1])
+    blocks[0].richText = extractHTMLAfterH3(dataSection1, 's-lg-content-78601395', blocks[0]) // Box Name: Library Status Updates: Access To Libraries and Services
+    blocks[1].richText = extractHTMLAfterH3(dataSection2, 's-lg-content-81550455', blocks[1]) // Box Name: Library Status Updates: Planned Library Construction
     const dom = new JSDOM(dataSummary);
     const document = dom.window.document;
-    const contentDiv = document.getElementById('s-lg-content-78759148')
+    const contentDiv = document.getElementById('s-lg-content-78759148') // Box Name: Library Status Updates: Summary
     response.summary = contentDiv.innerHTML
     
     // Return the response from the external API
