@@ -10,3 +10,8 @@
   from = "/api/libguides/library/status/updates/proxy"              # Route for the proxy service
   to = "/.netlify/functions/libraryStatusUpdatesProxy" # Serverless function endpoint
   status = 200
+
+[[redirects]]
+  from = "/api/libguides/ftva/global/proxy"              # Route for the proxy service
+  to = "/.netlify/functions/ftvaGlobalProxy" # Serverless function endpoint
+  status = 200

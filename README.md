@@ -1,189 +1,334 @@
-# Library Status Update Proxies
+# Library Guides Proxy
 
-This repository hosts two Netlify serverless functions that serve as proxies for fetching and structuring HTML content from library update sources. These functions return JSON-formatted content for easier integration into frontend applications.
+This repository hosts Netlify serverless functions that proxy HTML content from UCLA Library LibGuides and return structured JSON for frontend applications. The proxies normalize HTML responses into a consistent format, allowing consuming applications to avoid parsing LibGuides markup directly.
 
 ## Contents
 
 - [Overview](#overview)
-- [Proxy Functions](#proxy-functions)
+- [Proxy Endpoints](#proxy-endpoints)
   - [Global Data Proxy](#global-data-proxy)
   - [Library Status Updates Proxy](#library-status-updates-proxy)
+  - [FTVA Global Proxy](#ftva-global-proxy)
 - [Setup Instructions](#setup-instructions)
+  - [Prerequisites](#prerequisites)
   - [Local Development](#local-development)
-  - [Deployment](#deployment)
+- [Deployment](#deployment)
+  - [Netlify Configuration](#netlify-configuration)
+  - [Preview Deployments](#preview-deployments)
 - [Configuration](#configuration)
 - [Example Response](#example-response)
 - [Dependencies](#dependencies)
+- [Gotchas](#gotchas)
 
 ---
 
-## Overview
+# Overview
 
-This project provides structured access to library data by creating two endpoint proxies:
+This project exposes proxy endpoints that retrieve HTML from LibGuides, extract the required content, and return structured JSON.
 
-1. **Global Data Proxy** for library alert banners.
-2. **Library Status Updates Proxy** for ongoing updates about library facilities and services.
+Currently, the project provides three endpoints:
 
-## Proxy Functions
-
-### Global Data Proxy
-
-**Path**: `/api/libguides/global/proxy`
-
-- **Purpose**: Retrieves library alert banner data, such as full-banner alerts and dismissible alert boxes.
-- **Output**: JSON with `title` and `text` fields for each alert type.
-
-### Library Status Updates Proxy
-
-**Path**: `/api/libguides/library/status/updates/proxy`
-
-- **Purpose**: Gathers specific library status updates, extracting structured content after each `<h3>` header.
-- **Output**: JSON object containing a `sectionTitle` and `richText` for each update section.
+1. **Global Data Proxy** – Returns global library alert banners.
+2. **Library Status Updates Proxy** – Returns structured library status updates.
+3. **FTVA Global Proxy** – Returns global alerts for the Film & Television Archive (FTVA).
 
 ---
 
-## Setup Instructions
+# Proxy Endpoints
 
-### Local Development
+## Global Data Proxy
 
-1. **Install Dependencies**:
-   ```bash
-   pnpm install
-   ```
+**Endpoint**
 
-### Install Netlify CLI
+```
+/api/libguides/global/proxy
+```
 
-Install the Netlify CLI globally to enable local function emulation:
+### Purpose
 
-````bash
+Retrieves library-wide alert banner content, including:
+
+- Full-width banner alerts
+- Dismissible alert boxes
+
+### Response
+
+```json
+{
+  "bannerAlert": {
+    "text": "<p>...</p>"
+  },
+  "infoAlert": {
+    "title": "Alert Title",
+    "text": "<p>...</p>"
+  }
+}
+```
+
+---
+
+## Library Status Updates Proxy
+
+**Endpoint**
+
+```
+/api/libguides/library/status/updates/proxy
+```
+
+### Purpose
+
+Retrieves structured library status updates from the Library Alerts & Status Updates LibGuide.
+
+Each section is extracted from the LibGuide and returned as structured JSON.
+
+### Response
+
+Each section contains:
+
+- `sectionTitle`
+- `richText`
+
+along with any additional structured content such as cards and call-to-actions.
+
+---
+
+## FTVA Global Proxy
+
+**Endpoint**
+
+```
+/api/libguides/ftva/global/proxy
+```
+
+### Purpose
+
+Retrieves Film & Television Archive (FTVA) global alert content from LibGuides.
+
+The proxy returns:
+
+- Global banner alert
+- Dismissible information alert
+
+### Response
+
+```json
+{
+  "bannerAlert": {
+    "text": "<p>...</p>"
+  },
+  "infoAlert": {
+    "title": "Summer Intermission",
+    "text": "<p>Screenings will be on pause...</p>"
+  }
+}
+```
+
+---
+
+# Setup Instructions
+
+## Prerequisites
+
+Install project dependencies:
+
+```bash
+pnpm install
+```
+
+Install the Netlify CLI:
+
+```bash
 npm install -g netlify-cli
+```
 
-### Run Locally
-Use the Netlify CLI to start a local development server:
+---
+
+## Local Development
+
+Run the local Netlify development server:
 
 ```bash
 netlify dev
+```
 
-This will serve your functions locally and emulate the production environment.
+Netlify Functions will be available locally.
 
-Example:
+Examples:
+
+```
+http://localhost:8888/api/libguides/global/proxy
+```
+
+```
 http://localhost:8888/api/libguides/library/status/updates/proxy
+```
+
+```
+http://localhost:8888/api/libguides/ftva/global/proxy
+```
 
 ---
-### Deployment
 
-#### Connect Repository to Netlify
-1. Go to the Netlify Dashboard.
-2. Select **New Site** > **Import an Existing Project** and choose this repository.
+# Deployment
 
-#### Automatic Setup
-Netlify will automatically detect the `netlify.toml` configuration file and use the specified settings.
+This project is deployed on **Netlify**.
 
-## Configuration
+## Netlify Configuration
 
-## Example Response
+The project uses the following configuration in `netlify.toml`:
 
-````
+```toml
+[build]
+  functions = "netlify/functions"
 
+[[redirects]]
+  from = "/api/libguides/global/proxy"
+  to = "/.netlify/functions/globalDataProxy"
+  status = 200
+
+[[redirects]]
+  from = "/api/libguides/library/status/updates/proxy"
+  to = "/.netlify/functions/libraryStatusUpdatesProxy"
+  status = 200
+
+[[redirects]]
+  from = "/api/libguides/ftva/global/proxy"
+  to = "/.netlify/functions/ftvaGlobalProxy"
+  status = 200
+```
+
+---
+
+## Preview Deployments
+
+This repository is connected to GitHub and Netlify.
+
+Whenever a pull request is opened or updated:
+
+- GitHub Actions automatically builds the branch.
+- Netlify creates a **Preview Deployment**.
+- A preview URL is posted back to the pull request, allowing reviewers to test the changes before merging.
+
+Once the pull request is merged into the main branch, Netlify automatically deploys the latest production version.
+
+---
+
+# Configuration
+
+All LibGuide URLs, Box IDs, Map IDs, Config IDs, and HTML selectors are configured within the corresponding Netlify Function.
+
+If LibGuides content changes, these values may need to be updated.
+
+---
+
+# Example Response
+
+```json
 {
-summary: "
-
-<p>Last updated Tuesday, July 15, 2025.</p>
-
-    	   ",
-
-blocks: [
-{
-id: "4243666",
-typeHandle: "richText",
-richText: "<ul>
-
-<li>
-<p>Due to scheduled critical maintenance on the facility that supplies the campus with power, the <strong>UCLA Library Special Collections (LSC) Reading Room</strong> will be closed from Monday, July 28&nbsp;to Wednesday, July 30. It&nbsp;will re-open on Thursday, July 31. Please submit all paging requests for LSC materials by Thursday, July 24 to ensure materials are available for your visit on July 31.</p>
-</li>
-<li>
-<p>All other Library locations are operating normally. Please check <a href="https://www.library.ucla.edu/visit/locations/" style="background-color: rgb(255, 255, 255);">Locations &amp; Hours</a> before visiting.</p>
-</li>
-<li>
-<p><a href="https://www.library.ucla.edu/help/research-help/">Research Help</a> is available through research consultations and other resources.</p>
-</li>
-<li>
-<p>Use <a href="https://www.library.ucla.edu/help/services-resources/ask-us/">Ask Us</a> for questions, including 24/7 chat.</p>
-</li>
-
-</ul>",
-sectionTitle: "Access to Libraries and Services"
-},
-{
-id: "4243668",
-typeHandle: "richText",
-richText: "<p>No planned construction at this time.</p>",
-sectionTitle: "Planned Library Construction"
-},
-{
-id: "4243669",
-typeHandle: "simpleCards",
-sectionTitle: "Additional Campus Resources",
-sectionSummary: null,
-cards: [
-{
-id: "4243670",
-typeHandle: "externalServiceOrResource",
-title: "Bruins Safe Online",
-summary: "Information on the current campus status.",
-externalLink: "https://bso.ucla.edu"
-},
-{
-id: "4243986",
-typeHandle: "externalServiceOrResource",
-title: "Bruin Safety & Well-Being",
-summary: "Resources and services to assist the campus community during difficult times.",
-externalLink: "https://equity.ucla.edu/bruin-safety-well-being/?mc_cid=024964e8ea&mc_eid=9ef0760ab7"
-}
-]
-},
-{
-id: "4243671",
-typeHandle: "callToAction",
-callToAction: [
-{
-id: "4243672",
-titleCta: "Have Further Questions?",
-summary: "We're here to help. Chat with a librarian 24/7, schedule a research consultation or email us your quick questions.",
-icon: "svg-call-to-action-chat",
-buttonText: "Contact us",
-buttonUrl: "https://www.library.ucla.edu/help/services-resources/ask-us",
-backgroundColor: "false"
-}
-]
-}
-]
+  "summary": "<p>Last updated Tuesday, July 15, 2025.</p>",
+  "blocks": [
+    {
+      "id": "4243666",
+      "typeHandle": "richText",
+      "sectionTitle": "Access to Libraries and Services",
+      "richText": "<ul>...</ul>"
+    },
+    {
+      "id": "4243668",
+      "typeHandle": "richText",
+      "sectionTitle": "Planned Library Construction",
+      "richText": "<p>No planned construction at this time.</p>"
+    },
+    {
+      "id": "4243669",
+      "typeHandle": "simpleCards",
+      "sectionTitle": "Additional Campus Resources",
+      "cards": [
+        {
+          "title": "Bruins Safe Online",
+          "externalLink": "https://bso.ucla.edu"
+        }
+      ]
+    }
+  ]
 }
 ```
 
-## Gotchas
+---
 
-### If content editors accidently delete the box on Libguides Page
+# Dependencies
 
-`Library Alerts & Status Updates`
+- Node.js
+- Netlify Functions
+- Netlify CLI
+- jsdom
+
+---
+
+# Gotchas
+
+## If content editors accidentally delete the box on the LibGuides page
+
+**Library Alerts & Status Updates**
+
+Admin page:
 
 ```
 https://ucla.libapps.com/libguides/admin_c.php?g=1427138
+```
+
+Public page:
+
+```
 https://guides.library.ucla.edu/c.php?g=1427138&p=10587194#s-lg-box-wrapper-40758929
 ```
 
-#### Steps to fix:
+### Steps to fix
 
-1. Get the new box id, map id and config id and update the url of the box that got deleted and readded on the libguides page with the new box id, map id and config id
+### 1. Update the LibGuide URL
+
+If the content box is deleted and recreated, LibGuides generates new:
+
+- Box ID
+- Map ID
+- Config ID
+
+Update the corresponding URL in the Netlify Function.
+
+Example:
 
 ```
 https://github.com/UCLALibrary/libguides-proxy/blob/main/netlify/functions/libraryStatusUpdatesProxy.js#L63
 ```
 
-2. Also inspect the url and add the new id to extract the html content for the new box content
+---
 
-sample place to update in code
+### 2. Update the HTML selector
+
+After recreating the box, LibGuides also generates a new HTML element ID.
+
+Update the selector used to extract the content.
+
+Example:
 
 ```
 https://github.com/UCLALibrary/libguides-proxy/blob/main/netlify/functions/libraryStatusUpdatesProxy.js#L122
 ```
+
+---
+
+## If the FTVA LibGuide content is recreated
+
+The same process applies to the FTVA proxy.
+
+If an FTVA content box is deleted and recreated:
+
+1. Update the Box ID, Map ID, and Config ID in:
+
+```
+netlify/functions/ftvaGlobalProxy.js
+```
+
+2. Update any HTML element IDs used by the parser (for example, `s-lg-content-xxxxxxxx`) to match the newly generated LibGuides markup.
+
+Failure to update these IDs will result in empty `bannerAlert` or `infoAlert` responses.
