@@ -19,5 +19,5 @@
 # Live LibGuides Search proxy for GitHub Pages previews.
 [[redirects]]
   from = "/api/libguides/search/proxy"
-  to = "/.netlify/functions/searchProxy"
+  to = "/.netlify/functions/search-proxy"
   status = 200
