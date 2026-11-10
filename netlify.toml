@@ -21,3 +21,8 @@
   from = "/api/libguides/search/proxy"
   to = "/.netlify/functions/search-proxy"
   status = 200
+
+[[redirects]]
+  from = "/api/libguides/az/databases/proxy"
+  to = "/.netlify/functions/azDatabasesProxy"
+  status = 200
