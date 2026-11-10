@@ -37,26 +37,35 @@ const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 // Expand this list when new filters are confirmed.
 
 const ALLOWED_PARAMS = new Set([
+  // Search
   'q',
   'action',
   'search_source_id',
   'layout',
   'start',
-  'group_id',
-  'guide_id',
   'sort',
   'sort_field',
   'sort_dir',
   'default_lg',
+
+  // Guide and group identifiers
+  'guide_id',
+  'group_id',
+  'f_group_id',
+
+  // Guide filters
   'guide_subject_ids',
   'guide_tag_ids',
   'guide_type_id',
   'guide_owner_id',
+
+  // Additional filter parameters
   'f_guide_subject_ids',
   'f_guide_tag_ids',
   'f_guide_type_id',
   'f_guide_owner_id',
 ]);
+
 
 
 
