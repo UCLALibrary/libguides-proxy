@@ -35,26 +35,39 @@ const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 
 // Search parameters supported by Springshare.
 // Expand this list when new filters are confirmed.
+
 const ALLOWED_PARAMS = new Set([
+  // Search
   'q',
   'action',
   'search_source_id',
   'layout',
   'start',
-  'group_id',
   'sort',
   'sort_field',
   'sort_dir',
   'default_lg',
+
+  // Guide and group identifiers
+  'guide_id',
+  'group_id',
+  'f_group_id',
+
+  // Guide filters
   'guide_subject_ids',
   'guide_tag_ids',
   'guide_type_id',
   'guide_owner_id',
+
+  // Additional filter parameters
   'f_guide_subject_ids',
   'f_guide_tag_ids',
   'f_guide_type_id',
   'f_guide_owner_id',
 ]);
+
+
+
 
 function getCorsHeaders(origin) {
   if (!ALLOWED_ORIGINS.has(origin)) {
@@ -64,10 +77,13 @@ function getCorsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers':
+      'Content-Type, X-Requested-With',
+    'Access-Control-Max-Age': '3600',
     Vary: 'Origin',
   };
 }
+
 
 function jsonResponse(data, status, headers) {
   return new Response(JSON.stringify(data), {
