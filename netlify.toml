@@ -15,3 +15,9 @@
   from = "/api/libguides/ftva/global/proxy"              # Route for the proxy service
   to = "/.netlify/functions/ftvaGlobalProxy" # Serverless function endpoint
   status = 200
+
+# Live LibGuides Search proxy for GitHub Pages previews.
+[[redirects]]
+  from = "/api/libguides/search/proxy"
+  to = "/.netlify/functions/search-proxy"
+  status = 200
