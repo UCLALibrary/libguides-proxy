@@ -37,6 +37,9 @@ const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 // Expand this list when new filters are confirmed.
 
 const ALLOWED_PARAMS = new Set([
+    // Bootstrap 5
+  'bs5',
+  
   // Search
   'q',
   'action',
